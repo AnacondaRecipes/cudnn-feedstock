@@ -4,6 +4,6 @@ mkdir -p $PREFIX/include
 cp include/cudnn.h $PREFIX/include/
 
 mkdir -p $PREFIX/lib
-cp lib64/libcudnn.so.7.6.5 $PREFIX/lib/
-ln -s $PREFIX/lib/libcudnn.so.7.6.5 $PREFIX/lib/libcudnn.so.7
-ln -s $PREFIX/lib/libcudnn.so.7 $PREFIX/lib/libcudnn.so
+cp lib64/libcudnn.so.8.2.1 $PREFIX/lib/
+ln -s $PREFIX/lib/libcudnn.so.8.2.1 $PREFIX/lib/libcudnn.so.8
+ln -s $PREFIX/lib/libcudnn.so.8 $PREFIX/lib/libcudnn.so

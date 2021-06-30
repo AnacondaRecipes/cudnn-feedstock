@@ -1,13 +1,13 @@
-{% set cudnn_version= "7.6.5.32" %}
+{% set cudnn_version= "8.2.1.32" %}
 {% set build_number= "0" %}
 # The cuDNN installers can be downloaded from https://developer.nvidia.com/cudnn
 # The download requires authetication, for this recipe to work download the
 # packages to an staging location and adjust src_dir to this location.
-{% set src_dir = "file:///home/user/Downloads" %}
+{% set src_dir = "file:///home/builder/nvidia" %}
 
 package:
   name: cudnn
-  version: 7.6.5
+  version: 8.2.1
 
 source:
   url: {{ src_dir }}/cudnn-{{ cuda_version }}-linux-x64-v{{ cudnn_version }}.tgz      # [linux]
@@ -16,6 +16,7 @@ source:
   sha256: 28355e395f0b2b93ac2c83b61360b35ba6cd0377e44e78be197b6b61b4b492ba            # [linux and cuda_version=='10.0']
   sha256: 7eaec8039a2c30ab0bc758d303588767693def6bf49b22485a2c00bf2e136cb3            # [linux and cuda_version=='10.1']
   sha256: 600267f2caaed2fd58eb214ba669d8ea35f396a7d19b94822e6b36f9f7088c20            # [linux and cuda_version=='10.2']
+  sha256: 39412acd9ef5dd27954b6b9f5df75bd381c5d7ceb7979af6c743a7f4521f9c77            # [linux and cuda_version=='11.3']
   url: {{ src_dir }}/cudnn-{{ cuda_version }}-windows10-x64-v{{ cudnn_version }}.zip  # [win64]
   sha256: c7401514a6d7d24e8541f88c12e4328f165b5c5afd010ee462d356cac2158268            # [win and cuda_version=='9.0']
   sha256: ffa553df2e9af1703bb7786a784356989dac5c415bf5bca73e52b1789ddd4984            # [win and cuda_version=='9.2']
@@ -39,16 +40,17 @@ requirements:
     - cudatoolkit >=10.0,<10.1  # [cuda_version=='10.0']
     - cudatoolkit >=10.1,<10.2  # [cuda_version=='10.1']
     - cudatoolkit >=10.2,<10.3  # [cuda_version=='10.2']
+    - cudatoolkit >=11.3,<11.4  # [cuda_version=='11.3']
 
 test:
   commands:
     - test -f ${PREFIX}/lib/libcudnn.so                   # [linux]
-    - test -f ${PREFIX}/lib/libcudnn.so.7                 # [linux]
-    - test -f ${PREFIX}/lib/libcudnn.so.7.6.5             # [linux]
+    - test -f ${PREFIX}/lib/libcudnn.so.8                 # [linux]
+    - test -f ${PREFIX}/lib/libcudnn.so.8.2.1             # [linux]
     - test -f ${PREFIX}/include/cudnn.h                   # [linux]
     - if not exist %LIBRARY_INC%\\cudnn.h exit 1          # [win]
     - if not exist %LIBRARY_LIB%\\x64\\cudnn.lib exit 1   # [win]
-    - if not exist %LIBRARY_BIN%\\cudnn64_7.dll exit 1    # [win]
+    - if not exist %LIBRARY_BIN%\\cudnn64_8.dll exit 1    # [win]
 
 about:
   summary: "NVIDIA's cuDNN deep neural network acceleration library"
