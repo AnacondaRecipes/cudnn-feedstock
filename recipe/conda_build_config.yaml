@@ -1,3 +1,4 @@
 cuda_maj_version:
 - 11
-- 12
+# We don't have cudatoolkit v12 packaged yet - uncomment this line when we have.
+# - 12
