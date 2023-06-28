@@ -1,33 +1,24 @@
-{% set cudnn_version= "8.2.1.32" %}
+{% set cudnn_version= "8.9.2.26" %}
 {% set build_number= "0" %}
-# The cuDNN installers can be downloaded from https://developer.nvidia.com/cudnn
-# The download requires authetication, for this recipe to work download the
-# packages to an staging location and adjust src_dir to this location.
+# The cuDNN installers can be downloaded from https://developer.nvidia.com/rdp/cudnn-download
+# The download requires authentication, for this recipe to work download the
+# packages to a local location and adjust src_dir to this location.
 {% set src_dir = "file:///home/builder/nvidia" %}
 
 package:
   name: cudnn
-  version: 8.2.1
+  version: {{ cudnn_version }}
 
 source:
-  url: {{ src_dir }}/cudnn-{{ cuda_version }}-linux-x64-v{{ cudnn_version }}.tgz      # [linux]
-  sha256: bd0a4c0090d5b02feec3f195738968690cc2470b9bc6026e6fe8ff245cd261c8            # [linux and cuda_version=='9.0']
-  sha256: a2a2c7a8ba7b16d323b651766ee37dcfdbc2b50d920f73f8fde85005424960e4            # [linux and cuda_version=='9.2']
-  sha256: 28355e395f0b2b93ac2c83b61360b35ba6cd0377e44e78be197b6b61b4b492ba            # [linux and cuda_version=='10.0']
-  sha256: 7eaec8039a2c30ab0bc758d303588767693def6bf49b22485a2c00bf2e136cb3            # [linux and cuda_version=='10.1']
-  sha256: 600267f2caaed2fd58eb214ba669d8ea35f396a7d19b94822e6b36f9f7088c20            # [linux and cuda_version=='10.2']
-  sha256: 39412acd9ef5dd27954b6b9f5df75bd381c5d7ceb7979af6c743a7f4521f9c77            # [linux and cuda_version=='11.3']
-  url: {{ src_dir }}/cudnn-{{ cuda_version }}-windows10-x64-v{{ cudnn_version }}.zip  # [win64]
-  sha256: c7401514a6d7d24e8541f88c12e4328f165b5c5afd010ee462d356cac2158268            # [win and cuda_version=='9.0']
-  sha256: ffa553df2e9af1703bb7786a784356989dac5c415bf5bca73e52b1789ddd4984            # [win and cuda_version=='9.2']
-  sha256: 2767db23ae2cd869ac008235e2adab81430f951a92a62160884c80ab5902b9e8            # [win and cuda_version=='10.0']
-  sha256: 5e4275d738cc3a105cf6558b70b8a2ff514989ca1cd17bc8515086e20561a652            # [win and cuda_version=='10.1']
-  sha256: fba812f60c61bc33b81db06cd55e8d769774d036186571d724295c71c9936064            # [win and cuda_version=='10.2']
+  url: {{ src_dir }}/cudnn-linux-x86_64-{{ cudnn_version }}_cuda{{ cuda_maj_version }}-archive.tar.xz     # [linux and x86_64]
+  sha256: 39883d1bcab4bd2bf3dac5a2172b38533c1e777e45e35813100059e5091406f6                                # [linux and x86_64]
+  url: {{ src_dir }}/cudnn-windows-x86_64-{{ cudnn_version }}_cuda{{ cuda_maj_version }}-archive.zip      # [win and x86_64]
+  sha256: d3daa2297917333857eaaba1213dd9fc05c099d94e88663274a0f37a4e9baf9d                                # [win and x86_64]
 
 build:
-  skip: True  # [not linux64 and not win64]
+  skip: True  # [not (linux and x86_64) and not (win and x86_64)]
   number: {{ build_number }}
-  string: cuda{{ cuda_version }}_{{ build_number }}
+  string: cuda{{ cuda_maj_version }}_{{ build_number }}
   missing_dso_whitelist:
     - '*'
   run_exports:
@@ -35,24 +26,26 @@ build:
 
 requirements:
   run:
-    - cudatoolkit >=9.0,<9.1    # [cuda_version=='9.0']
-    - cudatoolkit >=9.2,<9.3    # [cuda_version=='9.2']
-    - cudatoolkit >=10.0,<10.1  # [cuda_version=='10.0']
-    - cudatoolkit >=10.1,<10.2  # [cuda_version=='10.1']
-    - cudatoolkit >=10.2,<10.3  # [cuda_version=='10.2']
-    - cudatoolkit >=11.3,<11.4  # [cuda_version=='11.3']
+    - cudatoolkit {{ cuda_maj_version }}
 
 test:
   commands:
-    - test -f ${PREFIX}/lib/libcudnn.so                   # [linux]
-    - test -f ${PREFIX}/lib/libcudnn.so.8                 # [linux]
-    - test -f ${PREFIX}/lib/libcudnn.so.8.2.1             # [linux]
-    - test -f ${PREFIX}/include/cudnn.h                   # [linux]
-    - if not exist %LIBRARY_INC%\\cudnn.h exit 1          # [win]
-    - if not exist %LIBRARY_LIB%\\x64\\cudnn.lib exit 1   # [win]
-    - if not exist %LIBRARY_BIN%\\cudnn64_8.dll exit 1    # [win]
+    - test -f ${PREFIX}/lib/libcudnn.so                                                             # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:1]) }}               # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:3]) }}               # [linux and x86_64]
+    - test -f ${PREFIX}/include/cudnn.h                                                             # [linux and x86_64]
+    - if not exist %LIBRARY_INC%\\cudnn.h exit 1                                                    # [win and x86_64]
+    - if not exist %LIBRARY_BIN%\\cudnn64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1  # [win and x86_64]
 
 about:
-  summary: "NVIDIA's cuDNN deep neural network acceleration library"
-  license_file: NVIDIA_SLA_cuDNN_Support.txt 
+  home: https://developer.nvidia.com/cudnn
+  license_file: LICENSE
+  license_family: PROPRIETARY
   license: Proprietary
+  summary: "NVIDIA's cuDNN deep neural network acceleration library"
+  description: |
+    The NVIDIA CUDA® Deep Neural Network library (cuDNN) is a GPU-accelerated library of primitives for deep neural
+    networks. cuDNN provides highly tuned implementations for standard routines such as forward and backward
+    convolution, pooling, normalization, and activation layers.
+  doc_url: https://docs.nvidia.com/deeplearning/cudnn
+  dev_url: https://developer.nvidia.com/rdp/cudnn-download

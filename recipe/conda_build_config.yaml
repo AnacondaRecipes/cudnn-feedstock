@@ -1,7 +1,4 @@
-cuda_version:
-#  - 9.0
-#  - 9.2
-#  - 10.0
-#  - 10.1
-#  - 10.2
-  - 11.3
+cuda_maj_version:
+- 11
+# We don't have cudatoolkit v12 packaged yet - uncomment this line when we have.
+# - 12

@@ -1,3 +1,4 @@
-MOVE bin\cudnn64_7.dll %LIBRARY_BIN%
-MOVE include\cudnn.h %LIBRARY_INC%
-MOVE lib\x64 %LIBRARY_LIB%
+: Copy all the header files and the shared libraries, but not the static libraries, into the prefix
+MOVE include\* %LIBRARY_INC%
+
+MOVE bin\* %LIBRARY_BIN%
