@@ -1,8 +1,9 @@
 {% set cudnn_version= "8.9.2.26" %}
 {% set build_number= "0" %}
 # The cuDNN installers can be downloaded from https://developer.nvidia.com/rdp/cudnn-download
-# The download requires authentication, for this recipe to work download the
-# packages to a local location and adjust src_dir to this location.
+# The download requires a manual sign-in to Nvidia's website. For this recipe to work, download the
+# packages to a local location and adjust src_dir to this location. Remember to escape backslashes
+# (i.e., on Windows).
 {% set src_dir = "file:///home/builder/nvidia" %}
 
 package:
