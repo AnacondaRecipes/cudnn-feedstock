@@ -27,7 +27,10 @@ build:
 
 requirements:
   run:
-    - cudatoolkit {{ cuda_maj_version }}
+    - cudatoolkit {{ cuda_maj_version }}.*   # [cuda_maj_version == 11]
+    - cuda-version {{ cuda_maj_version }}.*
+    - cuda-nvrtc                             # [cuda_maj_version == 12]
+    - libcublas                              # [cuda_maj_version == 12]
 
 test:
   commands:
