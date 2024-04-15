@@ -38,13 +38,23 @@ requirements:
     - libcublas                              # [cuda_maj_version == 12]
 
 test:
+  requires:
+    - {{ compiler('c') }}                                                                                        # [linux and x86_64]
+  files:
+    - test_load_elf.c                                                                                            # [linux and x86_64]
   commands:
-    - test -f ${PREFIX}/lib/libcudnn.so                                                             # [linux and x86_64]
-    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:1]) }}               # [linux and x86_64]
-    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:3]) }}               # [linux and x86_64]
-    - test -f ${PREFIX}/include/cudnn.h                                                             # [linux and x86_64]
-    - if not exist %LIBRARY_INC%\\cudnn.h exit 1                                                    # [win and x86_64]
-    - if not exist %LIBRARY_BIN%\\cudnn64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1  # [win and x86_64]
+    - if not exist %LIBRARY_INC%\\cudnn.h exit 1                                                                 # [win]
+    - if not exist %LIBRARY_INC%\\cudnn_adv_train.h exit 1                                                       # [win]
+    - if not exist %LIBRARY_BIN%\\cudnn64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1               # [win]
+    - if not exist %LIBRARY_BIN%\\cudnn_adv_train64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1     # [win]
+    - test -f ${PREFIX}/include/cudnn.h                                                                          # [linux and x86_64]
+    - test -f ${PREFIX}/include/cudnn_adv_train.h                                                                # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn.so                                                                          # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn_adv_train.so                                                                # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:1]) }}                            # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:3]) }}                            # [linux and x86_64]
+    - ${GCC} test_load_elf.c -std=c99 -Werror -ldl -o test_load_elf                                              # [linux and x86_64]
+    - for f in ${PREFIX}/lib/libcudnn*.so; do ./test_load_elf $f; done                                           # [linux and x86_64]
 
 about:
   home: https://developer.nvidia.com/cudnn
