@@ -1,23 +1,28 @@
 {% set cudnn_version= "8.9.2.26" %}
 {% set build_number= "0" %}
-# The cuDNN installers can be downloaded from https://developer.nvidia.com/rdp/cudnn-download
-# The download requires a manual sign-in to Nvidia's website. For this recipe to work, download the
-# packages to a local location and adjust src_dir to this location. Remember to escape backslashes
-# (i.e., on Windows).
-{% set src_dir = "file:///home/builder/nvidia" %}
+{% set platform = "linux-x86_64" %}  # [linux64]
+{% set platform = "linux-ppc64le" %}  # [ppc64le]
+{% set platform = "linux-sbsa" %}  # [aarch64]
+{% set platform = "windows-x86_64" %}  # [win]
+{% set extension = "tar.xz" %}  # [not win]
+{% set extension = "zip" %}  # [win]
+
 
 package:
   name: cudnn
   version: {{ cudnn_version }}
 
 source:
-  url: {{ src_dir }}/cudnn-linux-x86_64-{{ cudnn_version }}_cuda{{ cuda_maj_version }}-archive.tar.xz     # [linux and x86_64]
-  sha256: 39883d1bcab4bd2bf3dac5a2172b38533c1e777e45e35813100059e5091406f6                                # [linux and x86_64]
-  url: {{ src_dir }}/cudnn-windows-x86_64-{{ cudnn_version }}_cuda{{ cuda_maj_version }}-archive.zip      # [win and x86_64]
-  sha256: d3daa2297917333857eaaba1213dd9fc05c099d94e88663274a0f37a4e9baf9d                                # [win and x86_64]
+  url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ cudnn_version }}_cuda{{ cuda_maj_version }}-archive.{{ extension }}
+  sha256: 39883d1bcab4bd2bf3dac5a2172b38533c1e777e45e35813100059e5091406f6  # [linux64 and (cuda_maj_version == 11)]
+  sha256: ccafd7d15c2bf26187d52d79d9ccf95104f4199980f5075a7c1ee3347948ce32  # [linux64 and (cuda_maj_version == 12)]
+  sha256: ad0a45a7992fe165fef3c8be5eef4080ebad19a2334c29dfb01d605776927293  # [aarch64 and (cuda_maj_version == 11)]
+  sha256: 898d00c82f9ad8797bd6f6c639327b320a38fa4aeebfb2b3fbb2db0d38f7e1b0  # [aarch64 and (cuda_maj_version == 12)]
+  sha256: d3daa2297917333857eaaba1213dd9fc05c099d94e88663274a0f37a4e9baf9d  # [win and (cuda_maj_version == 11)]
+  sha256: 8cf26fec7362d7fac110df9986a579e932a7e1ae693a11e3fa77cca41ae4d8b9  # [win and (cuda_maj_version == 12)]
 
 build:
-  skip: True  # [not (linux and x86_64) and not (win and x86_64)]
+  skip: True  # [osx or (linux and s390x)]
   number: {{ build_number }}
   string: cuda{{ cuda_maj_version }}_{{ build_number }}
   missing_dso_whitelist:
