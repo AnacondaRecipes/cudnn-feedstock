@@ -36,6 +36,8 @@ requirements:
     - cuda-version {{ cuda_maj_version }}.*
     - cuda-nvrtc                             # [cuda_maj_version == 12]
     - libcublas                              # [cuda_maj_version == 12]
+    # libcudnn_cnn_infer.so needs libm.so.6 with ABI v2.27
+    - __glibc >=2.27                         # [linux and aarch64]
 
 test:
   requires:
