@@ -1,4 +1,4 @@
-{% set cudnn_version= "8.9.2.26" %}
+{% set cudnn_version= "9.1.1.17" %}
 {% set build_number= "0" %}
 {% set platform = "linux-x86_64" %}  # [linux64]
 {% set platform = "linux-ppc64le" %}  # [ppc64le]
@@ -14,12 +14,12 @@ package:
 
 source:
   url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ cudnn_version }}_cuda{{ cuda_maj_version }}-archive.{{ extension }}
-  sha256: 39883d1bcab4bd2bf3dac5a2172b38533c1e777e45e35813100059e5091406f6  # [linux64 and (cuda_maj_version == 11)]
-  sha256: ccafd7d15c2bf26187d52d79d9ccf95104f4199980f5075a7c1ee3347948ce32  # [linux64 and (cuda_maj_version == 12)]
-  sha256: ad0a45a7992fe165fef3c8be5eef4080ebad19a2334c29dfb01d605776927293  # [aarch64 and (cuda_maj_version == 11)]
-  sha256: 898d00c82f9ad8797bd6f6c639327b320a38fa4aeebfb2b3fbb2db0d38f7e1b0  # [aarch64 and (cuda_maj_version == 12)]
-  sha256: d3daa2297917333857eaaba1213dd9fc05c099d94e88663274a0f37a4e9baf9d  # [win and (cuda_maj_version == 11)]
-  sha256: 8cf26fec7362d7fac110df9986a579e932a7e1ae693a11e3fa77cca41ae4d8b9  # [win and (cuda_maj_version == 12)]
+  sha256: 15a8b77123c1911606b45703691ad0990892c6098070ffab0bcaa003183a7dcb  # [linux64 and (cuda_maj_version == 11)]
+  sha256: 992b4be26899cc4c618bb1f6989261df7d0a9f9032b2217bf1fce9dd3228c904  # [linux64 and (cuda_maj_version == 12)]
+  sha256: 534984ea42f9e754d78aace88d6b5bed124c2557d84350c9488776e4d0dffa56  # [aarch64 and (cuda_maj_version == 11)]
+  sha256: 19bd66ee9fb30348f18801a398d0bec98b4663866efa244ca122825b3429526c  # [aarch64 and (cuda_maj_version == 12)]
+  sha256: 58cec56a754ffdea3d19c5bec88c4cbbf4d00b94fe1ecbf10a3b3b8fa1d1b00e  # [win and (cuda_maj_version == 11)]
+  sha256: 3f1efb1a82e480594594e8b1fc8075a4852b4ada5a1fea3c8ec4b3ed1e5122ed  # [win and (cuda_maj_version == 12)]
 
 build:
   skip: True  # [osx or (linux and s390x)]
@@ -36,7 +36,11 @@ requirements:
     - cuda-version {{ cuda_maj_version }}.*
     - cuda-nvrtc                             # [cuda_maj_version == 12]
     - libcublas                              # [cuda_maj_version == 12]
-    # libcudnn_cnn_infer.so needs libm.so.6 with ABI v2.27
+    # libcudnn_cnn_infer.so needs libm.so.6 with ABI v2.27, shown when test_load_elf is run. So we include this __glibc
+    # restriction. This means, though, that we can't install cudnn in our linux-aarch64 builder containers (which have
+    # glibc v2.26), including to run the tests while building the package. However, we don't currently build anything for
+    # linux-aarch64 CUDA - and when we start, a solver error will flag up this issue to be handled appropriately at that
+    # time.
     - __glibc >=2.27                         # [linux and aarch64]
 
 test:
@@ -46,13 +50,13 @@ test:
     - test_load_elf.c                                                                                            # [linux and x86_64]
   commands:
     - if not exist %LIBRARY_INC%\\cudnn.h exit 1                                                                 # [win]
-    - if not exist %LIBRARY_INC%\\cudnn_adv_train.h exit 1                                                       # [win]
+    - if not exist %LIBRARY_INC%\\cudnn_adv.h exit 1                                                             # [win]
     - if not exist %LIBRARY_BIN%\\cudnn64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1               # [win]
-    - if not exist %LIBRARY_BIN%\\cudnn_adv_train64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1     # [win]
+    - if not exist %LIBRARY_BIN%\\cudnn_adv64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1           # [win]
     - test -f ${PREFIX}/include/cudnn.h                                                                          # [linux and x86_64]
-    - test -f ${PREFIX}/include/cudnn_adv_train.h                                                                # [linux and x86_64]
+    - test -f ${PREFIX}/include/cudnn_adv.h                                                                      # [linux and x86_64]
     - test -f ${PREFIX}/lib/libcudnn.so                                                                          # [linux and x86_64]
-    - test -f ${PREFIX}/lib/libcudnn_adv_train.so                                                                # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn_adv.so                                                                      # [linux and x86_64]
     - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:1]) }}                            # [linux and x86_64]
     - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:3]) }}                            # [linux and x86_64]
     - ${GCC} test_load_elf.c -std=c99 -Werror -ldl -o test_load_elf                                              # [linux and x86_64]
