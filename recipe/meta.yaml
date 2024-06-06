@@ -66,7 +66,7 @@ about:
   home: https://developer.nvidia.com/cudnn
   license_file: LICENSE
   license_family: PROPRIETARY
-  license: Proprietary
+  license: LicenseRef-Proprietary
   summary: "NVIDIA's cuDNN deep neural network acceleration library"
   description: |
     The NVIDIA CUDA® Deep Neural Network library (cuDNN) is a GPU-accelerated library of primitives for deep neural
