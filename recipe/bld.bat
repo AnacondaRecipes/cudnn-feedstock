@@ -1,4 +1,4 @@
-: Copy all the header files and the shared libraries, but not the static libraries, into the prefix
+: Copy all the header files, import libraries, and the shared libraries into the prefix
 MOVE include\* %LIBRARY_INC%
-
+MOVE lib\x64\* %LIBRARY_LIB%
 MOVE bin\* %LIBRARY_BIN%

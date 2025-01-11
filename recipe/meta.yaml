@@ -1,5 +1,5 @@
 {% set cudnn_version= "9.1.1.17" %}
-{% set build_number= "0" %}
+{% set build_number= "1" %}
 {% set platform = "linux-x86_64" %}  # [linux64]
 {% set platform = "linux-ppc64le" %}  # [ppc64le]
 {% set platform = "linux-sbsa" %}  # [aarch64]
@@ -51,6 +51,10 @@ test:
   commands:
     - if not exist %LIBRARY_INC%\\cudnn.h exit 1                                                                 # [win]
     - if not exist %LIBRARY_INC%\\cudnn_adv.h exit 1                                                             # [win]
+    - if not exist %LIBRARY_LIB%\\cudnn.lib exit 1                                                               # [win]
+    - if not exist %LIBRARY_LIB%\\cudnn64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.lib exit 1               # [win]
+    - if not exist %LIBRARY_LIB%\\cudnn_adv.lib exit 1                                                           # [win]
+    - if not exist %LIBRARY_LIB%\\cudnn_adv64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.lib exit 1           # [win]
     - if not exist %LIBRARY_BIN%\\cudnn64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1               # [win]
     - if not exist %LIBRARY_BIN%\\cudnn_adv64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1           # [win]
     - test -f ${PREFIX}/include/cudnn.h                                                                          # [linux and x86_64]
