@@ -1,5 +1,5 @@
-{% set cudnn_version= "9.10.2.21" %}
-{% set build_number= "0" %}
+{% set version = "9.10.2.21" %}
+{% set build_number = "0" %}
 {% set platform = "linux-x86_64" %}  # [linux64]
 {% set platform = "linux-ppc64le" %}  # [ppc64le]
 {% set platform = "linux-sbsa" %}  # [aarch64]
@@ -10,10 +10,10 @@
 
 package:
   name: cudnn
-  version: {{ cudnn_version }}
+  version: {{ version }}
 
 source:
-  url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ cudnn_version }}_cuda{{ cuda_maj_version }}-archive.{{ extension }}
+  url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ version }}_cuda{{ cuda_maj_version }}-archive.{{ extension }}
   sha256: ab05bc70a120425b8b811544a6bc6458ca1f3cc54a8ccc51a1113749ecab1442  # [linux64 and (cuda_maj_version == 11)]
   sha256: d0defcbc4c6dad711ff4cb66d254036a300c9071b07c7b64199aacab534313c1  # [linux64 and (cuda_maj_version == 12)]
   sha256: 6461e6037a3b8ab5a9c17f527877d493f7cde9eb855fadf686140c7e3fb41aaf  # [aarch64 and (cuda_maj_version == 11)]
@@ -52,17 +52,17 @@ test:
     - if not exist %LIBRARY_INC%\\cudnn.h exit 1                                                                 # [win]
     - if not exist %LIBRARY_INC%\\cudnn_adv.h exit 1                                                             # [win]
     - if not exist %LIBRARY_LIB%\\cudnn.lib exit 1                                                               # [win]
-    - if not exist %LIBRARY_LIB%\\cudnn64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.lib exit 1               # [win]
+    - if not exist %LIBRARY_LIB%\\cudnn64_{{ '.'.join(version.split('.')[0:1]) }}.lib exit 1               # [win]
     - if not exist %LIBRARY_LIB%\\cudnn_adv.lib exit 1                                                           # [win]
-    - if not exist %LIBRARY_LIB%\\cudnn_adv64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.lib exit 1           # [win]
-    - if not exist %LIBRARY_BIN%\\cudnn64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1               # [win]
-    - if not exist %LIBRARY_BIN%\\cudnn_adv64_{{ '.'.join(cudnn_version.split('.')[0:1]) }}.dll exit 1           # [win]
+    - if not exist %LIBRARY_LIB%\\cudnn_adv64_{{ '.'.join(version.split('.')[0:1]) }}.lib exit 1           # [win]
+    - if not exist %LIBRARY_BIN%\\cudnn64_{{ '.'.join(version.split('.')[0:1]) }}.dll exit 1               # [win]
+    - if not exist %LIBRARY_BIN%\\cudnn_adv64_{{ '.'.join(version.split('.')[0:1]) }}.dll exit 1           # [win]
     - test -f ${PREFIX}/include/cudnn.h                                                                          # [linux and x86_64]
     - test -f ${PREFIX}/include/cudnn_adv.h                                                                      # [linux and x86_64]
     - test -f ${PREFIX}/lib/libcudnn.so                                                                          # [linux and x86_64]
     - test -f ${PREFIX}/lib/libcudnn_adv.so                                                                      # [linux and x86_64]
-    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:1]) }}                            # [linux and x86_64]
-    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(cudnn_version.split('.')[0:3]) }}                            # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(version.split('.')[0:1]) }}                            # [linux and x86_64]
+    - test -f ${PREFIX}/lib/libcudnn.so.{{ '.'.join(version.split('.')[0:3]) }}                            # [linux and x86_64]
     - ${GCC} test_load_elf.c -std=c99 -Werror -ldl -o test_load_elf                                              # [linux and x86_64]
     - for f in ${PREFIX}/lib/libcudnn*.so; do ./test_load_elf $f; done                                           # [linux and x86_64]
 
