@@ -22,7 +22,7 @@ source:
   sha256: c1a4567d822ebda7373fa1f19255dff4942302de741f830160b6c7d1fb31af23  # [win and (cuda_maj_version == 12)]
 
 build:
-  skip: True  # [osx or (linux and s390x)]
+  skip: True  # [osx]
   number: {{ build_number }}
   string: cuda{{ cuda_maj_version }}_{{ build_number }}
   missing_dso_whitelist:
