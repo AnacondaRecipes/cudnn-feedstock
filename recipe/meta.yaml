@@ -54,6 +54,8 @@ outputs:
       run:
         - {{ pin_compatible("cuda-version", min_pin="x", max_pin="x") }}
         - {{ pin_subpackage("libcudnn-dev", exact=True) }}
+      run_constrained:
+        - cudnn-jit <0a
 
   - name: libcudnn
     build:
@@ -66,11 +68,6 @@ outputs:
       # NVIDIA binaries use RPATH which we remove, but dependencies are available at runtime
       missing_dso_whitelist:
         - '*'
-    files:
-      - lib/libcudnn*.so.*                  # [linux]
-      - lib/libcudnn*.so                    # [linux] - symlinks for linking
-      - Library/bin/cudnn*.dll              # [win]
-      - Library/lib/cudnn*.lib              # [win] - import libraries for linking
     requirements:
       build:
         - {{ compiler('c') }}
@@ -87,6 +84,8 @@ outputs:
         - {{ pin_compatible("cuda-version", min_pin="x", max_pin="x") }}
         - cuda-nvrtc
         - libcublas
+      run_constrained:
+        - libcudnn-jit <0a
     test:
       requires:
         - {{ compiler('c') }}  # [linux]
@@ -167,6 +166,8 @@ outputs:
       run:
         - {{ pin_compatible("cuda-version", min_pin="x", max_pin="x") }}
         - {{ pin_subpackage("libcudnn", exact=True) }}
+      run_constrained:
+        - libcudnn-jit-dev <0a
     test:
       commands:
         - if not exist "%LIBRARY_INC%\cudnn.h" (echo Missing cudnn.h && exit /b 1)  # [win]
@@ -190,6 +191,135 @@ outputs:
         - test -f $PREFIX/include/cudnn_v{{ soname }}.h                                              # [linux]
         - test -f $PREFIX/include/cudnn_version.h                                                    # [linux]
         - test -f $PREFIX/include/cudnn_version_v{{ soname }}.h                                      # [linux]
+
+  # Even though cudnn-jit is a meta package, need build/host/run to be set in order to generate unique outputs with unique hash
+  # for each build variant.
+  - name: cudnn-jit
+    build:
+      skip: true  # [win]
+      ignore_run_exports:
+        - cuda-version
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - {{ compiler('cuda') }}
+        - {{ stdlib("c") }}
+      host:
+        - cuda-version {{ cuda_compiler_version }}
+        - {{ pin_subpackage("libcudnn-jit-dev", exact=True) }}
+      run:
+        - {{ pin_compatible("cuda-version", min_pin="x", max_pin="x") }}
+        - {{ pin_subpackage("libcudnn-jit-dev", exact=True) }}
+      run_constrained:
+        - cudnn <0a
+
+  - name: libcudnn-jit
+    build:
+      skip: true  # [win]
+      # Disable binary relocation to workaround patchelf issue
+      # xref: https://github.com/NixOS/patchelf/issues/492
+      binary_relocation: false
+      ignore_run_exports:
+        - cuda-version
+      # Whitelist all DSOs for binary repackaging
+      # NVIDIA binaries use RPATH which we remove, but dependencies are available at runtime
+      missing_dso_whitelist:
+        - '*'
+    files:
+      - lib/libcudnn.so.{{ majorminorpatch }}                                         # [linux]
+      - lib/libcudnn.so.{{ soname }}                                                  # [linux]
+      - lib/libcudnn_engines_runtime_compiled.so.{{ majorminorpatch }}                # [linux]
+      - lib/libcudnn_engines_runtime_compiled.so.{{ soname }}                         # [linux]
+      - lib/libcudnn_graph.so.{{ majorminorpatch }}                                   # [linux]
+      - lib/libcudnn_graph.so.{{ soname }}                                            # [linux]
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - {{ compiler('cuda') }}
+        - {{ stdlib("c") }}
+        - patchelf >=0.12  # [linux]
+      host:
+        - cuda-version {{ cuda_compiler_version }}
+        # For Windows, zlib is statically linked into CUDNN 
+        # For Linux, zlib remains a dynamically linked dependency
+        - zlib  # [not win]
+      run:
+        - {{ pin_compatible("cuda-version", min_pin="x", max_pin="x") }}
+        - cuda-nvrtc
+        - libcublas
+      run_constrained:
+        - libcudnn <0a
+    test:
+      commands:
+        - test -f $PREFIX/lib/libcudnn.so.{{ majorminorpatch }}                                      # [linux]
+        - test -f $PREFIX/lib/libcudnn.so.{{ soname }}                                               # [linux]
+        - test -f $PREFIX/lib/libcudnn_engines_runtime_compiled.so.{{ majorminorpatch }}             # [linux]
+        - test -f $PREFIX/lib/libcudnn_engines_runtime_compiled.so.{{ soname }}                      # [linux]
+        - test -f $PREFIX/lib/libcudnn_graph.so.{{ majorminorpatch }}                                # [linux]
+        - test -f $PREFIX/lib/libcudnn_graph.so.{{ soname }}                                         # [linux]
+    about:
+      license: LicenseRef-NVIDIA-End-User-License-Agreement
+      license_file: LICENSE
+      license_url: https://docs.nvidia.com/deeplearning/cudnn/sla/index.html
+      summary: Graph JIT configuration for NVIDIA's cuDNN deep neural network acceleration library
+      description: |
+        This is a runtime package for Graph JIT configuration for NVIDIA's cuDNN deep neural network acceleration library.
+        Developers should install libcudnn-jit-dev.
+
+  - name: libcudnn-jit-dev
+    build:
+      skip: true  # [win]
+      ignore_run_exports:
+        - cuda-version
+      run_exports:
+        - {{ pin_subpackage("libcudnn-jit", max_pin="x") }}
+    files:
+      - include/cudnn*.h                                                                          # [linux]
+      - lib/libcudnn.so                                                                           # [linux]
+      - lib/libcudnn_engines_runtime_compiled.so                                                  # [linux]
+      - lib/libcudnn_graph.so                                                                     # [linux]
+    requirements:
+      build:
+        - {{ compiler('c') }}
+        - {{ compiler('cxx') }}
+        - {{ compiler('cuda') }}
+        - {{ stdlib("c") }}
+      host:
+        - cuda-version {{ cuda_compiler_version }}
+        - {{ pin_subpackage("libcudnn-jit", exact=True) }}
+      run:
+        - {{ pin_compatible("cuda-version", min_pin="x", max_pin="x") }}
+        - {{ pin_subpackage("libcudnn-jit", exact=True) }}
+      run_constrained:
+        - libcudnn-dev <0a
+    test:
+      commands:
+        - test -f $PREFIX/include/cudnn.h                                                            # [linux]
+        - test -f $PREFIX/include/cudnn_adv.h                                                        # [linux]
+        - test -f $PREFIX/include/cudnn_adv_v{{ soname }}.h                                          # [linux]
+        - test -f $PREFIX/include/cudnn_backend.h                                                    # [linux]
+        - test -f $PREFIX/include/cudnn_backend_v{{ soname }}.h                                      # [linux]
+        - test -f $PREFIX/include/cudnn_cnn.h                                                        # [linux]
+        - test -f $PREFIX/include/cudnn_cnn_v{{ soname }}.h                                          # [linux]
+        - test -f $PREFIX/include/cudnn_graph.h                                                      # [linux]
+        - test -f $PREFIX/include/cudnn_graph_v{{ soname }}.h                                        # [linux]
+        - test -f $PREFIX/include/cudnn_ops.h                                                        # [linux]
+        - test -f $PREFIX/include/cudnn_ops_v{{ soname }}.h                                          # [linux]
+        - test -f $PREFIX/include/cudnn_v{{ soname }}.h                                              # [linux]
+        - test -f $PREFIX/include/cudnn_version.h                                                    # [linux]
+        - test -f $PREFIX/include/cudnn_version_v{{ soname }}.h                                      # [linux]
+        - test -L $PREFIX/lib/libcudnn.so                                                            # [linux]
+        - test -L $PREFIX/lib/libcudnn_engines_runtime_compiled.so                                   # [linux]
+        - test -L $PREFIX/lib/libcudnn_graph.so                                                      # [linux]
+    about:
+      license: LicenseRef-NVIDIA-End-User-License-Agreement
+      license_file: LICENSE
+      license_url: https://docs.nvidia.com/deeplearning/cudnn/sla/index.html
+      summary: Graph JIT configuration for NVIDIA's cuDNN deep neural network acceleration library
+      description: |
+        This is a development package for Graph JIT configuration for NVIDIA's cuDNN deep neural network acceleration library
 
 about:
   home: https://developer.nvidia.com/cudnn
