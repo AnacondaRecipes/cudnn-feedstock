@@ -201,7 +201,6 @@ about:
   dev_url: https://developer.nvidia.com/rdp/cudnn-download
 
 extra:
-  feedstock-name: cudnn
   recipe-maintainers:
     - conda-forge/cuda
     - billysuh7
