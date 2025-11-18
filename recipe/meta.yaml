@@ -92,6 +92,7 @@ outputs:
       files:
         - test_load_elf.c      # [linux]
       commands:
+        - dir "%LIBRARY_BIN%\cudnn*.dll"  # [win]
         - if not exist "%LIBRARY_BIN%\cudnn64_{{ soname }}.dll" (echo Missing cudnn64_{{ soname }}.dll && exit /b 1)  # [win]
         - if not exist "%LIBRARY_BIN%\cudnn_adv64_{{ soname }}.dll" (echo Missing cudnn_adv64_{{ soname }}.dll && exit /b 1)  # [win]
         - if not exist "%LIBRARY_BIN%\cudnn_cnn64_{{ soname }}.dll" (echo Missing cudnn_cnn64_{{ soname }}.dll && exit /b 1)  # [win]
