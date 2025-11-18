@@ -1,11 +1,20 @@
 {% set version = "9.15.1.9" %}
 {% set soname = version.split('.')[0] %}
 {% set majorminorpatch = '.'.join(version.split('.')[:3]) %}
-{% set platform = "linux-x86_64" %}  # [linux64]
-{% set platform = "linux-sbsa" %}  # [aarch64]
-{% set platform = "windows-x86_64" %}  # [win]
-{% set extension = "tar.xz" %}  # [not win]
-{% set extension = "zip" %}  # [win]
+{% if os == "linux" and arch == "x86_64" %}
+{% set platform = "linux-x86_64" %}
+{% elif os == "linux" and arch == "aarch64" %}
+{% set platform = "linux-sbsa" %}
+{% elif os == "win" %}
+{% set platform = "windows-x86_64" %}
+{% else %}
+{% set platform = "linux-x86_64" %}  # Default fallback (will be skipped for unsupported platforms)
+{% endif %}
+{% if os == "win" %}
+{% set extension = "zip" %}
+{% else %}
+{% set extension = "tar.xz" %}
+{% endif %}
 
 package:
   name: cudnn-split
