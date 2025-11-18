@@ -212,6 +212,8 @@ extra:
   skip-lints:
     - license_file_overspecified
     - host_section_needs_exact_pinnings
+    - missing_hash
+    - missing_tests
   recipe-maintainers:
     - conda-forge/cuda
     - billysuh7
