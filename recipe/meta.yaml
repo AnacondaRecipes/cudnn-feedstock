@@ -18,9 +18,9 @@ package:
   version: {{ version }}
 
 source:
-  - url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ version }}_cuda12-archive.{{ extension }}
+  - url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ version }}_cuda12-archive.{{ extension }} # [(cuda_compiler_version or "").startswith("12")]
     sha256: {{ sha256_cuda12 }}  # [(cuda_compiler_version or "").startswith("12")]
-  - url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ version }}_cuda13-archive.{{ extension }}
+  - url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ version }}_cuda13-archive.{{ extension }} # [(cuda_compiler_version or "").startswith("13")]
     sha256: {{ sha256_cuda13 }}  # [(cuda_compiler_version or "").startswith("13")]
 
 build:
@@ -80,8 +80,7 @@ outputs:
         - patchelf >=0.12  # [linux]
       host:
         - cuda-version {{ cuda_compiler_version }}
-        # For Windows, zlib is statically linked into CUDNN since version 9.2
-        # https://docs.nvidia.com/deeplearning/cudnn/latest/release-notes.html#cudnn-9-2-0
+        # For Windows, zlib is statically linked into CUDNN 
         # For Linux, zlib remains a dynamically linked dependency
         - zlib  # [not win]
       run:
@@ -144,7 +143,7 @@ outputs:
         - test -L $PREFIX/lib/libcudnn_graph.so                                                      # [linux]
         - test -L $PREFIX/lib/libcudnn_heuristic.so                                                  # [linux]
         - test -L $PREFIX/lib/libcudnn_ops.so                                                        # [linux]
-        - ${GCC} test_load_elf.c -std=c99 -Werror -ldl -o test_load_elf                              # [linux]
+        - ${CC} test_load_elf.c -std=c99 -Werror -ldl -o test_load_elf                              # [linux]
         - for f in $PREFIX/lib/libcudnn*.so.{{ majorminorpatch }}; do ./test_load_elf $f; done       # [linux]
 
   - name: libcudnn-dev
