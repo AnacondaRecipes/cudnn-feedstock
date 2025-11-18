@@ -1,18 +1,23 @@
-REM Copy all files from the archive - conda-build will select the right files for each output package
-REM based on the files: patterns in meta.yaml
-REM Windows archives use Library/bin, Library/include, Library/lib structure
-
-REM Copy header files
-if exist Library\include\* (
-    MOVE Library\include\* %LIBRARY_INC%
+if not exist %LIBRARY_INC% (
+    mkdir %LIBRARY_INC%
+    if errorlevel 1 exit 1
 )
 
-REM Copy import libraries
-if exist Library\lib\* (
-    MOVE Library\lib\* %LIBRARY_LIB%
+copy %SRC_DIR%\include\cudnn*.h %LIBRARY_INC%\
+if errorlevel 1 exit 1
+
+if not exist %LIBRARY_LIB% (
+    mkdir %LIBRARY_LIB%
+    if errorlevel 1 exit 1
 )
 
-REM Copy DLLs
-if exist Library\bin\* (
-    MOVE Library\bin\* %LIBRARY_BIN%
+copy %SRC_DIR%\lib\x64\cudnn*.lib %LIBRARY_LIB%\
+if errorlevel 1 exit 1
+
+if not exist %LIBRARY_BIN% (
+    mkdir %LIBRARY_BIN%
+    if errorlevel 1 exit 1
 )
+
+copy %SRC_DIR%\bin\cudnn*.dll %LIBRARY_BIN%\
+if errorlevel 1 exit 1
