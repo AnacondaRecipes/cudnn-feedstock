@@ -33,7 +33,7 @@ source:
 build:
   number: 0
   # Skip builds without CUDA compiler version specified
-  skip: true  # [cuda_compiler_version in (None, "None", "")]
+  skip: true  # [cuda_compiler_version in (None, "None", "") or osx]
 
 requirements:
   build:
@@ -78,6 +78,7 @@ outputs:
         - {{ compiler('cxx') }}
         - {{ compiler('cuda') }}
         - {{ stdlib("c") }}
+        - patchelf >=0.12  # [linux]
       host:
         - cuda-version {{ cuda_compiler_version }}
         # For Windows, zlib is statically linked into CUDNN since version 9.2
