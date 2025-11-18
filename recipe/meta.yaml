@@ -68,7 +68,9 @@ outputs:
         - '*'
     files:
       - lib/libcudnn*.so.*                  # [linux]
+      - lib/libcudnn*.so                    # [linux] - symlinks for linking
       - Library/bin/cudnn*.dll              # [win]
+      - Library/lib/cudnn*.lib              # [win] - import libraries for linking
     requirements:
       build:
         - {{ compiler('c') }}
@@ -89,6 +91,7 @@ outputs:
     test:
       requires:
         - {{ compiler('c') }}  # [linux]
+        - {{ stdlib("c") }}    # [linux]
       files:
         - test_load_elf.c      # [linux]
       commands:
@@ -101,6 +104,22 @@ outputs:
         - if not exist "%LIBRARY_BIN%\cudnn_graph64_{{ soname }}.dll" (echo Missing cudnn_graph64_{{ soname }}.dll && exit /b 1)  # [win]
         - if not exist "%LIBRARY_BIN%\cudnn_heuristic64_{{ soname }}.dll" (echo Missing cudnn_heuristic64_{{ soname }}.dll && exit /b 1)  # [win]
         - if not exist "%LIBRARY_BIN%\cudnn_ops64_{{ soname }}.dll" (echo Missing cudnn_ops64_{{ soname }}.dll && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn.lib" (echo Missing cudnn.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn64_{{ soname }}.lib" (echo Missing cudnn64_{{ soname }}.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_adv.lib" (echo Missing cudnn_adv.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_adv64_{{ soname }}.lib" (echo Missing cudnn_adv64_{{ soname }}.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_cnn.lib" (echo Missing cudnn_cnn.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_cnn64_{{ soname }}.lib" (echo Missing cudnn_cnn64_{{ soname }}.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_engines_precompiled.lib" (echo Missing cudnn_engines_precompiled.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_engines_precompiled64_{{ soname }}.lib" (echo Missing cudnn_engines_precompiled64_{{ soname }}.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_engines_runtime_compiled.lib" (echo Missing cudnn_engines_runtime_compiled.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_engines_runtime_compiled64_{{ soname }}.lib" (echo Missing cudnn_engines_runtime_compiled64_{{ soname }}.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_graph.lib" (echo Missing cudnn_graph.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_graph64_{{ soname }}.lib" (echo Missing cudnn_graph64_{{ soname }}.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_heuristic.lib" (echo Missing cudnn_heuristic.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_heuristic64_{{ soname }}.lib" (echo Missing cudnn_heuristic64_{{ soname }}.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_ops.lib" (echo Missing cudnn_ops.lib && exit /b 1)  # [win]
+        - if not exist "%LIBRARY_LIB%\cudnn_ops64_{{ soname }}.lib" (echo Missing cudnn_ops64_{{ soname }}.lib && exit /b 1)  # [win]
         - test -f $PREFIX/lib/libcudnn.so.{{ majorminorpatch }}                                      # [linux]
         - test -f $PREFIX/lib/libcudnn.so.{{ soname }}                                               # [linux]
         - test -f $PREFIX/lib/libcudnn_adv.so.{{ majorminorpatch }}                                  # [linux]
@@ -117,6 +136,14 @@ outputs:
         - test -f $PREFIX/lib/libcudnn_heuristic.so.{{ soname }}                                     # [linux]
         - test -f $PREFIX/lib/libcudnn_ops.so.{{ majorminorpatch }}                                  # [linux]
         - test -f $PREFIX/lib/libcudnn_ops.so.{{ soname }}                                           # [linux]
+        - test -L $PREFIX/lib/libcudnn.so                                                            # [linux]
+        - test -L $PREFIX/lib/libcudnn_adv.so                                                        # [linux]
+        - test -L $PREFIX/lib/libcudnn_cnn.so                                                        # [linux]
+        - test -L $PREFIX/lib/libcudnn_engines_precompiled.so                                        # [linux]
+        - test -L $PREFIX/lib/libcudnn_engines_runtime_compiled.so                                   # [linux]
+        - test -L $PREFIX/lib/libcudnn_graph.so                                                      # [linux]
+        - test -L $PREFIX/lib/libcudnn_heuristic.so                                                  # [linux]
+        - test -L $PREFIX/lib/libcudnn_ops.so                                                        # [linux]
         - ${GCC} test_load_elf.c -std=c99 -Werror -ldl -o test_load_elf                              # [linux]
         - for f in $PREFIX/lib/libcudnn*.so.{{ majorminorpatch }}; do ./test_load_elf $f; done       # [linux]
 
@@ -129,8 +156,6 @@ outputs:
     files:
       - include/cudnn*.h                                                                             # [linux]
       - Library/include/cudnn*.h                                                                     # [win]
-      - lib/libcudnn*.so                                                                             # [linux]
-      - Library/lib/cudnn*.lib                                                                       # [win]
     requirements:
       build:
         - {{ compiler('c') }}
@@ -152,22 +177,6 @@ outputs:
         - if not exist "%LIBRARY_INC%\cudnn_graph.h" (echo Missing cudnn_graph.h && exit /b 1)  # [win]
         - if not exist "%LIBRARY_INC%\cudnn_ops.h" (echo Missing cudnn_ops.h && exit /b 1)  # [win]
         - if not exist "%LIBRARY_INC%\cudnn_version.h" (echo Missing cudnn_version.h && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn.lib" (echo Missing cudnn.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn64_{{ soname }}.lib" (echo Missing cudnn64_{{ soname }}.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_adv.lib" (echo Missing cudnn_adv.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_adv64_{{ soname }}.lib" (echo Missing cudnn_adv64_{{ soname }}.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_cnn.lib" (echo Missing cudnn_cnn.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_cnn64_{{ soname }}.lib" (echo Missing cudnn_cnn64_{{ soname }}.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_engines_precompiled.lib" (echo Missing cudnn_engines_precompiled.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_engines_precompiled64_{{ soname }}.lib" (echo Missing cudnn_engines_precompiled64_{{ soname }}.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_engines_runtime_compiled.lib" (echo Missing cudnn_engines_runtime_compiled.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_engines_runtime_compiled64_{{ soname }}.lib" (echo Missing cudnn_engines_runtime_compiled64_{{ soname }}.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_graph.lib" (echo Missing cudnn_graph.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_graph64_{{ soname }}.lib" (echo Missing cudnn_graph64_{{ soname }}.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_heuristic.lib" (echo Missing cudnn_heuristic.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_heuristic64_{{ soname }}.lib" (echo Missing cudnn_heuristic64_{{ soname }}.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_ops.lib" (echo Missing cudnn_ops.lib && exit /b 1)  # [win]
-        - if not exist "%LIBRARY_LIB%\cudnn_ops64_{{ soname }}.lib" (echo Missing cudnn_ops64_{{ soname }}.lib && exit /b 1)  # [win]
         - test -f $PREFIX/include/cudnn.h                                                            # [linux]
         - test -f $PREFIX/include/cudnn_adv.h                                                        # [linux]
         - test -f $PREFIX/include/cudnn_adv_v{{ soname }}.h                                          # [linux]
@@ -182,14 +191,6 @@ outputs:
         - test -f $PREFIX/include/cudnn_v{{ soname }}.h                                              # [linux]
         - test -f $PREFIX/include/cudnn_version.h                                                    # [linux]
         - test -f $PREFIX/include/cudnn_version_v{{ soname }}.h                                      # [linux]
-        - test -L $PREFIX/lib/libcudnn.so                                                            # [linux]
-        - test -L $PREFIX/lib/libcudnn_adv.so                                                        # [linux]
-        - test -L $PREFIX/lib/libcudnn_cnn.so                                                        # [linux]
-        - test -L $PREFIX/lib/libcudnn_engines_precompiled.so                                        # [linux]
-        - test -L $PREFIX/lib/libcudnn_engines_runtime_compiled.so                                   # [linux]
-        - test -L $PREFIX/lib/libcudnn_graph.so                                                      # [linux]
-        - test -L $PREFIX/lib/libcudnn_heuristic.so                                                  # [linux]
-        - test -L $PREFIX/lib/libcudnn_ops.so                                                        # [linux]
 
 about:
   home: https://developer.nvidia.com/cudnn
