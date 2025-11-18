@@ -209,6 +209,9 @@ about:
   dev_url: https://developer.nvidia.com/rdp/cudnn-download
 
 extra:
+  skip-lints:
+    - license_file_overspecified
+    - host_section_needs_exact_pinnings
   recipe-maintainers:
     - conda-forge/cuda
     - billysuh7
