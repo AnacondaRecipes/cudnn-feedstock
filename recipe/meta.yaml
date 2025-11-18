@@ -69,13 +69,10 @@ outputs:
       binary_relocation: false
       ignore_run_exports:
         - cuda-version
-      # Whitelist DSOs that are found via RPATH but are available at runtime
-      # These are either in the same package or provided by dependencies
+      # Whitelist all DSOs for binary repackaging
+      # NVIDIA binaries use RPATH which we remove, but dependencies are available at runtime
       missing_dso_whitelist:
-        - libcudnn_graph.so.9
-        - libcudnn_ops.so.9
-        - libz.so.1
-        - libstdc++.so.6
+        - '*'
     files:
       - lib/libcudnn*.so.*                  # [linux]
       - Library/bin/cudnn*.dll              # [win]
