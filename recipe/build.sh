@@ -18,3 +18,5 @@ for lib in $PREFIX/lib/libcudnn*.so.*; do
         patchelf --remove-rpath "$lib" 2>/dev/null || true
     fi
 done
+
+check-glibc ${PREFIX}/${targetsDir}/lib/*.so.*
