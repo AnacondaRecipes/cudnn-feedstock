@@ -1,4 +1,23 @@
-: Copy all the header files, import libraries, and the shared libraries into the prefix
-MOVE include\* %LIBRARY_INC%
-MOVE lib\x64\* %LIBRARY_LIB%
-MOVE bin\* %LIBRARY_BIN%
+if not exist %LIBRARY_INC% (
+    mkdir %LIBRARY_INC%
+    if errorlevel 1 exit 1
+)
+
+copy %SRC_DIR%\include\cudnn*.h %LIBRARY_INC%\
+if errorlevel 1 exit 1
+
+if not exist %LIBRARY_LIB% (
+    mkdir %LIBRARY_LIB%
+    if errorlevel 1 exit 1
+)
+
+copy %SRC_DIR%\lib\x64\cudnn*.lib %LIBRARY_LIB%\
+if errorlevel 1 exit 1
+
+if not exist %LIBRARY_BIN% (
+    mkdir %LIBRARY_BIN%
+    if errorlevel 1 exit 1
+)
+
+copy %SRC_DIR%\bin\cudnn*.dll %LIBRARY_BIN%\
+if errorlevel 1 exit 1
