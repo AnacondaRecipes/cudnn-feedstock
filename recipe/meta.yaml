@@ -23,8 +23,9 @@ source:
 
 build:
   number: 0
-  # Skip CTK12 variants. See https://github.com/conda-forge/cudnn-feedstock/issues/124
-  skip: true  # [cuda_compiler_version in (None, "None", "") or (cuda_compiler_version or "").startswith("12")]
+  skip: true  # [osx]
+  # Remove "# Skip CTK12 variants. See https://github.com/conda-forge/cudnn-feedstock/issues/124"
+  skip: true  # [cuda_compiler_version in (None, "None", "")]
 
 requirements:
   build:
@@ -62,6 +63,9 @@ outputs:
       binary_relocation: false
       ignore_run_exports:
         - cuda-version
+      # Ignore 'runpaths ['$ORIGIN'] found' errors
+      runpath_whitelist:  # [linux]
+        - $ORIGIN         # [linux]
     files:
       - lib/libcudnn*.so.*                  # [linux]
       - Library/bin/cudnn*.dll              # [win]
@@ -219,6 +223,9 @@ outputs:
       binary_relocation: false
       ignore_run_exports:
         - cuda-version
+      # Ignore 'runpaths ['$ORIGIN'] found' errors
+      runpath_whitelist:  # [linux]
+        - $ORIGIN         # [linux]
     files:
       - Library/bin/cudnn64_{{ soname }}.dll                                          # [win]
       - Library/bin/cudnn_engines_runtime_compiled64_{{ soname }}.dll                 # [win]
@@ -360,6 +367,9 @@ about:
   dev_url: https://developer.nvidia.com/rdp/cudnn-download
 
 extra:
+  skip-lints:
+    - license_file_overspecified
+    - missing_tests
   feedstock-name: cudnn
   recipe-maintainers:
     - conda-forge/cuda

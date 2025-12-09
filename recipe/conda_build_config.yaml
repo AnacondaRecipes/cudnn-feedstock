@@ -1,8 +1,29 @@
-c_compiler_version:
-  - 11 # [linux]
-cxx_compiler_version:
-  - 11 # [linux]
-
+# cuDNN v9.17 support matrix:
+# https://docs.nvidia.com/deeplearning/cudnn/backend/v9.17.0/reference/support-matrix.html
+#
+# Linux builds:
+#  * Keep CUDA 12.4 for GCC 11.2.0+ compatibility
+#  * Use latest CUDA 12.x and 13.x for GCC 14.3.0+ compatibility
+#
+# Windows builds:
+#  * Use latest CUDA 12.x and 13.x
 cuda_compiler_version:
-  - 12.4
+  - 12.4                     # [linux]
   - 12.8
+  - 13.0
+
+c_compiler_version:          # [linux]
+  - 11.2.0                   # [linux]
+  - 14.3.0                   # [linux]
+  - 14.3.0                   # [linux]
+
+cxx_compiler_version:        # [linux]
+  - 11.2.0                   # [linux]
+  - 14.3.0                   # [linux]
+  - 14.3.0                   # [linux]
+
+zip_keys:
+  -                          # [linux]
+    - c_compiler_version     # [linux]
+    - cxx_compiler_version   # [linux]
+    - cuda_compiler_version  # [linux]
