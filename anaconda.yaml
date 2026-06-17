@@ -1,0 +1,12 @@
+anaconda_config_version: 1
+upstream_sources:
+  - webpage:
+      url: https://api.anaconda.org/package/conda-forge/cudnn
+      regex: '"version":\s*"([^"]+)"'
+    packages:
+      - cudnn
+      - libcudnn
+      - libcudnn-dev
+      - cudnn-jit
+      - libcudnn-jit
+      - libcudnn-jit-dev
