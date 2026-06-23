@@ -1,16 +1,20 @@
-# cuDNN v9.17 support matrix:
-# https://docs.nvidia.com/deeplearning/cudnn/backend/v9.17.0/reference/support-matrix.html
+# cuDNN support matrix:
+# https://docs.nvidia.com/deeplearning/cudnn/backend/latest/reference/support-matrix.html
 #
-# Linux builds:
+# Linux builds (CUDA paired with GCC via zip_keys below):
 #  * Keep CUDA 12.4 for GCC 11.2.0+ compatibility
 #  * Use latest CUDA 12.x and 13.x for GCC 14.3.0+ compatibility
 #
-# Windows builds:
-#  * Use latest CUDA 12.x and 13.x
+# This local cuda_compiler_version is linux-only on purpose: Windows CUDA
+# variants now come from the aggregate CBC (cuda_compiler_version is
+# `# [linux or (win and x86_64)]`). Leaving 12.8/13.0 unscoped here made them
+# leak to win and collide with the aggregate, zipping mismatched lengths
+# (c_compiler_version vs cuda_compiler_version) at graph generation. The
+# gcc<->cuda zip_keys applies only on linux, so win uses MSVC + aggregate CUDA.
 cuda_compiler_version:
   - 12.4                     # [linux]
-  - 12.8
-  - 13.0
+  - 12.8                     # [linux]
+  - 13.0                     # [linux]
 
 c_compiler_version:          # [linux]
   - 11.2.0                   # [linux]
