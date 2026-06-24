@@ -19,5 +19,6 @@ if not exist %LIBRARY_BIN% (
     if errorlevel 1 exit 1
 )
 
-copy %SRC_DIR%\bin\cudnn*.dll %LIBRARY_BIN%\
+REM cuDNN 9.23 moved the Windows DLLs from bin\ to bin\x64\ (matching lib\x64).
+copy %SRC_DIR%\bin\x64\cudnn*.dll %LIBRARY_BIN%\
 if errorlevel 1 exit 1
