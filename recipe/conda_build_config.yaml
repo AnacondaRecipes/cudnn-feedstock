@@ -1,33 +1,15 @@
-# cuDNN support matrix:
-# https://docs.nvidia.com/deeplearning/cudnn/backend/latest/reference/support-matrix.html
+# cuDNN is a binary redist repack. The CUDA variant matrix (12.x + 13.x) is
+# inherited from the aggregate CBC's cuda_compiler_version.
 #
-# Linux builds (CUDA paired with GCC via zip_keys below):
-#  * Keep CUDA 12.4 for GCC 11.2.0+ compatibility
-#  * Use latest CUDA 12.x and 13.x for GCC 14.3.0+ compatibility
-#
-# This local cuda_compiler_version is linux-only on purpose: Windows CUDA
-# variants now come from the aggregate CBC (cuda_compiler_version is
-# `# [linux or (win and x86_64)]`). Leaving 12.8/13.0 unscoped here made them
-# leak to win and collide with the aggregate, zipping mismatched lengths
-# (c_compiler_version vs cuda_compiler_version) at graph generation. The
-# gcc<->cuda zip_keys applies only on linux, so win uses MSVC + aggregate CUDA.
-cuda_compiler_version:
-  - 12.4                     # [linux]
-  - 12.8                     # [linux]
-  - 13.0                     # [linux]
-
-c_compiler_version:          # [linux]
-  - 11.2.0                   # [linux]
-  - 14.3.0                   # [linux]
-  - 14.3.0                   # [linux]
-
-cxx_compiler_version:        # [linux]
-  - 11.2.0                   # [linux]
-  - 14.3.0                   # [linux]
-  - 14.3.0                   # [linux]
-
-zip_keys:
-  -                          # [linux]
-    - c_compiler_version     # [linux]
-    - cxx_compiler_version   # [linux]
-    - cuda_compiler_version  # [linux]
+# The previous local `c_compiler_version x cuda_compiler_version` zip (which
+# paired gcc 11.2.0 with cuda 12.4 for an older-toolchain build) was removed:
+# the aggregate now owns cuda_compiler_version (including win, via
+# `# [linux or (win and x86_64)]`), and that collided with the local zip_keys
+# at graph generation (zip-length mismatch between the aggregate's
+# c_compiler_version and cuda_compiler_version). For a binary repack the build
+# compiler does not affect NVIDIA's prebuilt libraries, and every cuda-12.x
+# build pins the same `cuda-version >=12,<13` at runtime, so the dropped
+# gcc-11.2/cuda-12.4 variant added no runtime coverage. conda-forge likewise
+# uses no gcc<->cuda zip for cuDNN.
+arm_variant_type: # [aarch64]
+  - sbsa          # [aarch64]
