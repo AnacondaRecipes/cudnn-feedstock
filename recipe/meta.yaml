@@ -1,4 +1,4 @@
-{% set version = "9.23.1.3" %}
+{% set version = "9.25.1.1" %}
 {% set soname = version.split('.')[0] %}
 {% set majorminorpatch = '.'.join(version.split('.')[:3]) %}
 {% set platform = "linux-x86_64" %}  # [linux64]
@@ -14,17 +14,16 @@ package:
 source:
   url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ version }}_cuda12-archive.{{ extension }}  # [(cuda_compiler_version or "").startswith("12")]
   url: https://developer.download.nvidia.com/compute/cudnn/redist/cudnn/{{ platform }}/cudnn-{{ platform }}-{{ version }}_cuda13-archive.{{ extension }}  # [(cuda_compiler_version or "").startswith("13")]
-  sha256: 4ee977ed4abaf4d39810db31bc4ab4ff51a884f907c33446d8feb706550ad65c  # [linux64 and (cuda_compiler_version or "").startswith("12")]
-  sha256: bce62e93b32909445fcae8c383868dedff6aea7ef653e3e80a450fc5f7340d35  # [linux64 and (cuda_compiler_version or "").startswith("13")]
-  sha256: dbbf149c4b944d5b3fb81e78c81ce8bdb10eef2d7960b9231ebabf71e7819bdd  # [aarch64 and (cuda_compiler_version or "").startswith("12")]
-  sha256: 1096dbebc724cade8fbc7a16a1e1057b4a41286b805226ad2ded870e00858334  # [aarch64 and (cuda_compiler_version or "").startswith("13")]
-  sha256: 6062e48b9a04fc6eff1643ec38890be7fb0ed01efeb998f1ff25ae97a6a70813  # [win and (cuda_compiler_version or "").startswith("12")]
-  sha256: c317dd1298a191dd1ba44e00906c5b69ac80d17f5c32e17c5f880819a9a9c38d  # [win and (cuda_compiler_version or "").startswith("13")]
+  sha256: c1fa31ced64beea24dab254bab722c9d04c167dcae996ed2d7f40a67b507ec57  # [linux64 and (cuda_compiler_version or "").startswith("12")]
+  sha256: b9510625b662825b652466aa68bd1b40dd7324f6e967488f757d1538c4f09a34  # [linux64 and (cuda_compiler_version or "").startswith("13")]
+  sha256: 7a58edca1cf4c0756265d32dafdfd37bcfd235378d88c5ea3545879bcfc5f6a2  # [aarch64 and (cuda_compiler_version or "").startswith("12")]
+  sha256: f5a4ddb8481a305df9d5a85c46ac5bca3922a48af8a42c30db07421910f2cba2  # [aarch64 and (cuda_compiler_version or "").startswith("13")]
+  sha256: c49b3ace1cc4523fa9fc38ce7b06ca192ae9d0be9e5f661de5c302e8d8980f13  # [win and (cuda_compiler_version or "").startswith("12")]
+  sha256: 356c63c79b7af5ebec6c8c77af635af28d9a24d4aeae0252ee4bdb64a6a7a946  # [win and (cuda_compiler_version or "").startswith("13")]
 
 build:
   number: 0
   skip: true  # [osx]
-  # Remove "# Skip CTK12 variants. See https://github.com/conda-forge/cudnn-feedstock/issues/124"
   skip: true  # [cuda_compiler_version in (None, "None", "")]
 
 requirements:
