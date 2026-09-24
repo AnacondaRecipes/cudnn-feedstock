@@ -11,5 +11,5 @@
 # build pins the same `cuda-version >=12,<13` at runtime, so the dropped
 # gcc-11.2/cuda-12.4 variant added no runtime coverage. conda-forge likewise
 # uses no gcc<->cuda zip for cuDNN.
-arm_variant_type: # [aarch64]
-  - sbsa          # [aarch64]
+arm_variant_type: # [linux and aarch64]
+  - sbsa          # [linux and aarch64]
