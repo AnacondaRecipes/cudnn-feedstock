@@ -72,6 +72,14 @@ outputs:
       # Ignore 'runpaths ['$ORIGIN'] found' errors
       runpath_whitelist:  # [linux]
         - $ORIGIN         # [linux]
+      # Anaconda: libcudnn_engines_runtime_compiled.so links the CUDA driver
+      # (libcuda.so.*), which ships with the NVIDIA GPU driver, not a conda
+      # package. Anaconda builds with --error-overlinking, so allow it.
+      # missing_dso_whitelist is used for compatibility with older conda-build.
+      # conda-build deprecates it as of 26.9 and schedules removal for 27.3;
+      # switch to missing_dso_allowlist then.
+      missing_dso_whitelist:  # [linux]
+        - "*/libcuda.so.*"  # [linux]
     files:
       - lib/libcudnn*.so.*                  # [linux]
       - Library/bin/cudnn*.dll              # [win]
@@ -257,6 +265,14 @@ outputs:
       # Ignore 'runpaths ['$ORIGIN'] found' errors
       runpath_whitelist:  # [linux]
         - $ORIGIN         # [linux]
+      # Anaconda: libcudnn_engines_runtime_compiled.so links the CUDA driver
+      # (libcuda.so.*), which ships with the NVIDIA GPU driver, not a conda
+      # package. Anaconda builds with --error-overlinking, so allow it.
+      # missing_dso_whitelist is used for compatibility with older conda-build.
+      # conda-build deprecates it as of 26.9 and schedules removal for 27.3;
+      # switch to missing_dso_allowlist then.
+      missing_dso_whitelist:  # [linux]
+        - "*/libcuda.so.*"  # [linux]
     files:
       - Library/bin/cudnn64_{{ soname }}.dll                                          # [win]
       - Library/bin/cudnn_engines_runtime_compiled64_{{ soname }}.dll                 # [win]
